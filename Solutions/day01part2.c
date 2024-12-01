@@ -8,7 +8,7 @@ int compare(const void* a, const void*b) {
 }
 
 int main() {
-    FILE* f = fopen("in.txt", "r");
+    FILE* f = fopen("input.txt", "r");
 
     int list1[SIZE];
     int list2[SIZE];
