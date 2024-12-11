@@ -76,6 +76,7 @@ long countStones(long value, int iterations) {
     ENTRY* result = hsearch(entry, FIND);
     if (result != NULL) {
         count = *(long*)result->data;
+        free(entry.key);
         return count;
     }
     // apply rules, recursively calling the function
