@@ -15,37 +15,33 @@
 #define SIZE 140
 #endif
 
-int min(int a, int b);
-
 int main() {
     FILE* f = fopen(FILE_NAME, "r");
 
-
-    int tokens = 0;
+    long tokens = 0;
 
     while (!feof(f)) {
-        int ax, ay, bx, by;
-        long px, py;
-        fscanf(f, "Button A: X+%d, Y+%d ", &ax, &ay);
-        fscanf(f, "Button B: X+%d, Y+%d ", &bx, &by);
+        long ax, ay, bx, by, px, py;
+        fscanf(f, "Button A: X+%ld, Y+%ld ", &ax, &ay);
+        fscanf(f, "Button B: X+%ld, Y+%ld ", &bx, &by);
         fscanf(f, "Prize: X=%ld, Y=%ld ", &px, &py);
 
-        long minTokens = __LONG_MAX__;
+        px += 10000000000000;
+        py += 10000000000000;
 
-        if ((ax/3.0)*(ax/3.0) + (ay/3.0)*(ay/3.0) > bx*bx + by*by) {
+        long numeratorX = px*by - py*bx;
+        long denomiatorX = ax*by - ay*bx;
+        
+        long numeratorY = px*ay - py*ax;
+        long denomiatorY = ay*bx - ax*by;
 
-        }
-        else {
-
+        if (numeratorX % denomiatorX == 0 && numeratorY % denomiatorY == 0) {
+            long a = numeratorX / denomiatorX;
+            long b = numeratorY / denomiatorY;
+            tokens += 3*a + b;
+            printf("%ld\n", 3*a + b);
         }
     }
 
-    printf("%d\n", tokens);
-}
-
-int min(int a, int b) {
-    if (a < b) {
-        return a;
-    }
-    return b;
+    printf("%ld\n", tokens);
 }
