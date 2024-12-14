@@ -47,9 +47,8 @@ int main() {
     }
 
 
-    // I noticed that the map got jumbled at 113, 214, 315, etc.
-    // So, I only checked those ones
-    // the first tree I saw by randomly scrolling was too high, so I just set that as the upper bound and looked again
+    // The final Christmas tree has a long vertical line, so this will check for that
+    // because (a + b*c) mod c = a mod c, we only have to loop WIDTH*HEIGHT itterations
     for (int t = 1; t < WIDTH*HEIGHT; t++) {
         int map[WIDTH][HEIGHT] = {0};
         
@@ -80,6 +79,7 @@ int main() {
         if (maxRun >= 10) {
             printMap(map);
             printf("%d\n", t);
+            break;
         }
     }
 }
