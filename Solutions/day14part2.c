@@ -28,6 +28,9 @@ typedef struct {
     int vy;
 } Robot;
 
+void printMap(int map[WIDTH][HEIGHT]);
+int max(int a, int b);
+
 int main() {
     FILE* f = fopen(FILE_NAME, "r");
 
@@ -47,24 +50,36 @@ int main() {
     // I noticed that the map got jumbled at 113, 214, 315, etc.
     // So, I only checked those ones
     // the first tree I saw by randomly scrolling was too high, so I just set that as the upper bound and looked again
-    for (int t = 113; t < 37786; t+=101) {
+    for (int t = 1; t < WIDTH*HEIGHT; t++) {
         int map[WIDTH][HEIGHT] = {0};
-        printf("%d\n", t);
+        
         for (int i = 0; i < NUM_ROBOTS; i++) {
             int px = mod(robots[i].px + robots[i].vx * t, WIDTH);
             int py = mod(robots[i].py + robots[i].vy * t, HEIGHT);
             map[px][py] = 1;
         }
-        for (int y = 0; y < HEIGHT; y++) {
-            for (int x = 0; x < WIDTH; x++) {
-                if (map[x][y]) {
-                    printf("#");
+        int maxRun = 0;
+        for (int x = 0; x < WIDTH; x++) {
+            int running = 0;
+            int run = 0;
+            for (int y = 0; y < HEIGHT; y++) {
+                if (!running && map[x][y]) {
+                    running = 1;
+                    run = 0;
                 }
-                else {
-                    printf(".");
+                else if (running && map[x][y]) {
+                    run ++;
+                }
+                else if (running && !map[x][y]) {
+                    running = 0;
+                    maxRun = max(maxRun, run);
+                    run = 0;
                 }
             }
-            printf("\n");
+        }
+        if (maxRun >= 10) {
+            printMap(map);
+            printf("%d\n", t);
         }
     }
 }
@@ -76,4 +91,25 @@ int mod(int a, int b) {
         result += b;
     }
     return result;
+}
+
+void printMap(int map[WIDTH][HEIGHT]) {
+    for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            if (map[x][y]) {
+                printf("#");
+            }
+            else {
+                printf(".");
+            }
+        }
+        printf("\n");
+    }
+}
+
+int max(int a, int b) {
+    if (a > b) {
+        return a;
+    }
+    return b;
 }
