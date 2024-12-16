@@ -15,11 +15,12 @@
 #define SIZE 17
 #endif
 
-
 #ifdef INPUT
 #define FILE_NAME "input.txt"
 #define SIZE 141
 #endif
+
+// calculates the result for part 1, then uses a dfs to mark all possible paths of the minimum length
 
 enum {
     NORTH,
@@ -37,19 +38,18 @@ typedef struct {
 
 int min(int a, int b);
 int mod(int a, int b);
+void insertQueue(Move m);
+Move popQueue();
 int markPathsOfScore(int r, int c, int direction, int score, int target);
 
+Move moveQueue[SIZE*SIZE*20];
+int queueSize = 0;
 char map[SIZE][SIZE];
 int seatMap[SIZE][SIZE] = {0};
 int minDistance[SIZE][SIZE][4];
 
-// calculates the result for part 1, then uses a dfs to mark all possible paths of the minimum length
-
 int main() {
     FILE* f = fopen(FILE_NAME, "r");
-
-    Move moves[SIZE*SIZE*20];
-    int numMoves = 0;
 
     // start row, start column
     int sr, sc;
@@ -67,23 +67,12 @@ int main() {
         }
     }
 
-    moves[0] = (Move){sr, sc, EAST, 0};
-    numMoves ++;
+    insertQueue((Move){sr, sc, EAST, 0});
 
     int score;
 
-    while (numMoves != 0) {
-        int bestIndex = 0;
-        for (int i = 0; i < numMoves; i++) {
-            if (moves[i].score < moves[bestIndex].score) {
-                bestIndex = i;
-            }
-        }
-        Move bestMove = moves[bestIndex];
-        for (int i = bestIndex+1; i < numMoves; i++) {
-            moves[i-1] = moves[i];
-        }
-        numMoves --;
+    while (queueSize != 0) {
+        Move bestMove = popQueue();
         int r = bestMove.r;
         int c = bestMove.c;
         int direction = bestMove.direction;
@@ -98,27 +87,24 @@ int main() {
             continue;
         }
         minDistance[r][c][direction] = score;
-        moves[numMoves] = (Move){r, c, mod(direction+1,4),score+1000};
-        numMoves ++;
-        moves[numMoves] = (Move){r, c, mod(direction-1,4),score+1000};
-        numMoves ++;
+        insertQueue((Move){r, c, mod(direction+1,4),score+1000});
+        insertQueue((Move){r, c, mod(direction-1,4),score+1000});
         if (direction == NORTH) {
-            moves[numMoves] = (Move){r-1, c, direction, score+1};
+            insertQueue((Move){r-1, c, direction, score+1});
         }
         if (direction == EAST) {
-            moves[numMoves] = (Move){r, c+1, direction, score+1};
+            insertQueue((Move){r, c+1, direction, score+1});
         }
         if (direction == SOUTH) {
-            moves[numMoves] = (Move){r+1, c, direction, score+1};
+            insertQueue((Move){r+1, c, direction, score+1});
         }
         if (direction == WEST) {
-            moves[numMoves] = (Move){r, c-1, direction, score+1};
+            insertQueue((Move){r, c-1, direction, score+1});
         }
-        numMoves ++;
 
     }
-    // Part 2 starts here
     printf("%d\n", score);
+    // Part 2 starts here
     int numSeats = 0;
     markPathsOfScore(sr, sc, EAST, 0, score);
     for (int r = 0; r < SIZE; r++) {
@@ -192,5 +178,54 @@ int markPathsOfScore(int r, int c, int direction, int score, int target) {
         seatMap[r][c] = 1;
     }
     return isBestPath;
+}
+
+void shiftUp(int index) {
+    while (index > 0 && moveQueue[(index - 1) / 2].score > moveQueue[index].score) {
+        Move temp = moveQueue[index];
+        moveQueue[index] = moveQueue[(index - 1) / 2];
+        moveQueue[(index - 1) / 2] = temp;
+        index = (index-1)/2;
+    }
+}
+
+void shiftDown(int index) {
+    int minIndex = index;
+
+    int left = ((2 * index) + 1);
+    int right = ((2 * index) + 2);
+
+    if (left < queueSize && moveQueue[left].score < moveQueue[minIndex].score) {
+        minIndex = left;
+    }
+    if (right < queueSize && moveQueue[right].score < moveQueue[minIndex].score) {
+        minIndex = right;
+    }
+    if (minIndex != index) {
+        Move temp = moveQueue[index];
+        moveQueue[index] = moveQueue[minIndex];
+        moveQueue[minIndex] = temp;
+        shiftDown(minIndex);
+    }
+}
+
+void insertQueue(Move m) {
+    moveQueue[queueSize] = m;
+
+    int index = queueSize;
+    queueSize ++;
+
+    shiftUp(index);
+}
+
+Move popQueue() {
+    Move result = moveQueue[0];
+
+    moveQueue[0] = moveQueue[queueSize-1];
+    queueSize --;
+
+    shiftDown(0);
+
+    return result;
 }
 
