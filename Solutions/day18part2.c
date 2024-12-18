@@ -8,13 +8,11 @@
 #ifdef TEST
 #define FILE_NAME "test.txt"
 #define SIZE 7
-#define COUNT 12
 #endif
 
 #ifdef INPUT
 #define FILE_NAME "input.txt"
 #define SIZE 71
-#define COUNT 1024
 #endif
 
 // BFS
@@ -32,24 +30,31 @@ struct Position {
 Position* start = NULL;
 Position* end;
 
+int checkForPath();
 void insertQueue(int r, int c, int d);
 Position popQueue();
+void resetQueue();
 
 int map[SIZE][SIZE] = {0};
 
 int main() {
     FILE* f = fopen(FILE_NAME, "r");
     
-    for (int i = 0; i < COUNT; i++) {
+    while (!feof(f)) {
         int r, c;
         fscanf(f, "%d,%d ", &c, &r);
         map[r][c] = 1;
+        if (!checkForPath()) {
+            printf("%d,%d\n", c, r);
+            break;
+        }
     }
+}
 
+int checkForPath() {
+    resetQueue();
     insertQueue(0, 0, 0);
     int visited[SIZE][SIZE] = {0};
-
-    int distance;
 
     while (start != NULL) {
         Position p = popQueue();
@@ -57,8 +62,7 @@ int main() {
             continue;
         }
         if (p.r == SIZE-1 && p.c == SIZE-1) {
-            distance = p.d;
-            break;
+            return 1;
         }
         visited[p.r][p.c] = 1;
         if (p.r+1 < SIZE) {
@@ -74,7 +78,7 @@ int main() {
             insertQueue(p.r, p.c-1, p.d+1);
         }
     }
-    printf("%d\n", distance);
+    return 0;
 }
 
 void insertQueue(int r, int c, int d) {
@@ -103,4 +107,11 @@ Position popQueue() {
     result.next = NULL;
     free(p);
     return result;
+}
+
+void resetQueue() {
+    while (start != NULL) {
+        popQueue();
+    }
+    end = NULL;
 }
