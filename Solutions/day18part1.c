@@ -18,7 +18,6 @@
 #endif
 
 // BFS
-// Could be made faster by binary searching
 
 typedef struct Position Position;
 
