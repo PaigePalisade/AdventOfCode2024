@@ -3,7 +3,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define INPUT
+#define CHALLENGE
 
 #ifdef TEST
 #define FILE_NAME "test.txt"
@@ -13,6 +13,11 @@
 #ifdef INPUT
 #define FILE_NAME "input.txt"
 #define SIZE 71
+#endif
+
+#ifdef CHALLENGE
+#define FILE_NAME "challenge.txt"
+#define SIZE 213
 #endif
 
 // BFS
