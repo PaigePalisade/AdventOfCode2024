@@ -15,7 +15,7 @@
 
 int getSecret(int n);
 int sequenceToInt(int* seq);
-int max(int a, int b);
+void printSequence(int sequenceNum);
 
 // sums up the cost for every possible sequence at once and finds the best result
 
@@ -53,10 +53,15 @@ int main() {
         }
     }
     int cost = 0;
+    int sequence = 0;
     for (int i = 0; i < 19*19*19*19; i++) {
         assert(sequenceTotal[i] >= 0);
-        cost = max(cost, sequenceTotal[i]);
+        if (sequenceTotal[i] > cost) {
+            cost = sequenceTotal[i];
+            sequence = i;
+        }
     }
+    printSequence(sequence);
     printf("%d\n", cost);
 }
 
@@ -81,9 +86,6 @@ int sequenceToInt(int* seq) {
     return result;
 }
 
-int max(int a, int b) {
-    if (a > b) {
-        return a;
-    }
-    return b;
+void printSequence(int sequenceNum) {
+    printf("%d, %d, %d, %d\n", sequenceNum/6859-9, (sequenceNum%6859)/361-9, (sequenceNum%361)/19-9, sequenceNum%19-9);
 }
