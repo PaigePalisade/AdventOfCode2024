@@ -31,13 +31,17 @@ int main() {
 
     long sum = 0;
 
+    // stores the latest buyer to have that sequence
+    // to make sure sequences aren't double counted
+    int seenSequence[19*19*19*19] = {0};
+
+    int buyer = 1;
+    int values[2000];
+    int changes[2000];
+
     while (!feof(f)) {
         fscanf(f, "%d ", &secret);
-        // printf("%d: ", secret);
         int previous = 0;
-        int values[2000];
-        int changes[2000];
-        int seenSequence[19*19*19*19] = {0};
         for (int i = 0; i < 2000; i++) {
             secret = getSecret(secret);
             values[i] = (secret%10);
@@ -46,11 +50,12 @@ int main() {
         }
         for (int i = 1; i+3 < 2000; i++) {
             int sequenceNum = sequenceToInt(&changes[i]);
-            if (!seenSequence[sequenceNum]) {
-                seenSequence[sequenceNum] = 1;
+            if (seenSequence[sequenceNum] != buyer) {
+                seenSequence[sequenceNum] = buyer;
                 sequenceTotal[sequenceNum] += values[i+3];
             }
         }
+        buyer ++;
     }
     int cost = 0;
     int sequence = 0;
